@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Well Do You Know Me? 💗</title>
+<style>
+:root{--pink:#ff4f91;--deep:#e9347b;--ink:#633b55;--soft:#fff7fb}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:18px;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:linear-gradient(135deg,#ffd8e9,#f3ddff 52%,#d8edff)}
+.card{width:min(100%,520px);background:rgba(255,255,255,.94);border-radius:24px;padding:clamp(22px,5vw,36px);box-shadow:0 18px 55px #a65b8830;text-align:center;position:relative;overflow:hidden}
+.heart{font-size:32px;margin-bottom:8px}.eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#ba7097;font-weight:700}
+h1{font-size:clamp(26px,6vw,36px);margin:10px 0;color:#ed4388}p{line-height:1.55}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:13px 22px;font-weight:700;transition:transform .15s,filter .15s}
+button:hover{transform:translateY(-1px);filter:brightness(.98)}
+.primary{background:var(--pink);color:white;box-shadow:0 7px 16px #ff4f9130}.secondary{background:#f3e9f0;color:#8b6680}
+.hidden{display:none!important}
+.small{font-size:13px;color:#9b7890}
+.progress-wrap{height:7px;background:#f7e5ef;border-radius:99px;overflow:hidden;margin:16px 0 22px}
+.progress{height:100%;width:0;background:linear-gradient(90deg,#ff8fbb,#ed4388);transition:width .25s}
+.topline{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:#a35f85}
+.timer{border-radius:99px;background:#fff0f6;padding:8px 12px;color:#e9347b}
+.question{font-size:22px;font-weight:700;line-height:1.35;margin:18px 0}
+.answers{display:grid;gap:10px;margin:20px 0}
+.answer{width:100%;text-align:left;border:1.5px solid #f0d5e3;background:white;color:#754a63;border-radius:14px;padding:14px 16px}
+.answer:focus-visible,button:focus-visible{outline:3px solid #c9a3ff;outline-offset:3px}
+.answer.selected{border-color:var(--pink);background:#fff0f6;color:#d72d72}
+.answer:disabled{cursor:default;opacity:.8}
+#feedback{min-height:24px;font-size:14px;font-weight:700;color:#d72d72}
+input{width:100%;padding:13px 15px;border:1.5px solid #efcddd;border-radius:12px;font:inherit;margin:8px 0 14px}
+.flower{font-size:88px;animation:bloom 1.2s ease-in-out infinite alternate;display:inline-block}
+@keyframes bloom{from{transform:scale(.92) rotate(-4deg)}to{transform:scale(1.08) rotate(4deg)}}
+.petal{font-size:30px;letter-spacing:5px;margin:8px}
+.score{font-size:25px;font-weight:800;color:#e9347b;margin:12px}
+@media(max-width:420px){.card{border-radius:20px}.question{font-size:20px}.answer{padding:13px}}
+</style>
+</head>
+<body>
+<main class="card">
+  <section id="welcome">
+    <div class="heart">💗</div><div class="eyebrow">A little love quiz</div>
+    <h1>How well do you know me?</h1>
+    <p>Hi, babyyy! Let's see how much you remember about me. You have <b>40 seconds</b> for every question.</p>
+    <p class="small">15 questions · 3 choices each · made with love</p>
+    <button class="primary" id="startBtn">Start the quiz 💞</button>
+  </section>
+
+  <section id="quiz" class="hidden">
+    <div class="topline"><span id="count">QUESTION 1 OF 15</span><span class="timer">⏳ <span id="time">40</span>s</span></div>
+    <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+    <div id="feedback" aria-live="polite"></div>
+    <button class="primary hidden" id="nextBtn">Next question →</button>
+    <p class="small">Choose the answer you think is right 💕</p>
+  </section>
+
+  <section id="result" class="hidden">
+    <div class="flower">🌷</div>
+    <div class="petal">🌸 🌼 🌸</div>
+    <div class="eyebrow">Quiz complete</div>
+    <h1>You finished, babyyy!</h1>
+    <div class="score" id="score"></div>
+    <p id="message">No matter your score, you're still my favorite person. 💗</p>
+    <p>Here's a little flower for you, because you deserve something pretty. 🌷</p>
+    <button class="primary" id="againBtn">Play again 💞</button>
+  </section>
+</main>
+<script>
+
+const questions = [
+ {q:"What's my second name?", choices:["Justine","Justin","Justyn"], answer:"Justin"},
+ {q:"What's my favorite color?", choices:["Blue","Cyan","Light Blue"], answer:"Blue"},
+ {q:"What's my favorite food?", choices:["Siopao","Sisig","Adobo"], answer:"Adobo"},
+ {q:"What's one thing that always makes me happy?", choices:["Kiss","Sleep call","Playing games with you"], answer:"Kiss"},
+ {q:"What's my favorite sports?", choices:["Basketball","Soccer","Badminton"], answer:"Soccer"},
+ {q:"What do I prefer when I have a problem?", choices:["say the problem to you","some time alone","play games"], answer:"say the problem to you"},
+ {q:"What's the first nickname I called you??", choices:["Doli","Doli Dora","Te"], answer:"Doli"},
+ {q:"When is my birthday?", choices:["May 7, 2007","May 3, 2007","May 10, 2007"], answer:"May 3, 2007"},
+ {q:"What's my dream?", choices:["business man","information technology","pro player"], answer:"pro player"},
+ {q:"Happiest day for me?", choices:["July 30, 2026","October 2, 2026","August 21, 2026"], answer:"October 2, 2026"},
+ {q:"What do I usually do when we have an argument? ?", choices:["Wait for you to message","Try to fix things","Stay quiet first"], answer:"Try to fix things"},
+ {q:"What's one thing I never want to lose?", choices:["My dreams","The people I love","You"], answer:"You"},
+ {q:"What's something I secretly love receiving from you?", choices:["sweet messages","Random updates about your day","Random pictures of you"], answer:"Random pictures of you"},
+ {q:"What's my first impression to you?", choices:["maingay","nagagalit pag natatalo","tahimik tas hindi trashtalker"], answer:"tahimik tas hindi trashtalker"},
+ {q:"What's my most obvious sign that I'm jealous?", choices:["I become quiet","I ask a lot of questions","I become masungit"], answer:"I ask a lot of questions"}
+];
+const $=id=>document.getElementById(id);
+let index=0,score=0,timeLeft=40,timer=null,locked=false;
+function show(section){["welcome","quiz","result"].forEach(id=>$(id).classList.toggle("hidden",id!==section))}
+function start(){clearInterval(timer);index=0;score=0;show("quiz");renderQuestion()}
+function renderQuestion(){
+ locked=false;timeLeft=40; $("time").textContent=timeLeft;
+ $("count").textContent=`QUESTION ${index+1} OF ${questions.length}`;
+ $("progress").style.width=`${index/questions.length*100}%`;
+ $("question").textContent=questions[index].q;
+ $("answers").innerHTML="";$("feedback").textContent="";$("nextBtn").classList.add("hidden");
+ questions[index].choices.forEach(choice=>{
+   const b=document.createElement("button");b.className="answer";b.textContent=choice;
+   b.addEventListener("click",()=>choose(choice,b));$("answers").appendChild(b);
+ });
+ clearInterval(timer);
+ timer=setInterval(()=>{timeLeft--; $("time").textContent=timeLeft;if(timeLeft<=0){clearInterval(timer);if(!locked)timeoutQuestion()}},1000);
+}
+function choose(choice,button){
+ if(locked)return;locked=true;clearInterval(timer);
+ if(choice===questions[index].answer){score++;$("feedback").textContent="Correct! You know me well 🥹💗"}
+ else $("feedback").textContent="Aww, not quite! 💕";
+ [...$("answers").children].forEach(b=>{b.disabled=true;if(b.textContent===questions[index].answer)b.classList.add("selected")});
+ $("progress").style.width=`${(index+1)/questions.length*100}%`;
+ $("nextBtn").textContent=index===questions.length-1?"See my message 🌷":"Next question →";
+ $("nextBtn").classList.remove("hidden");
+}
+function timeoutQuestion(){
+ locked=true;$("feedback").textContent="Time's up! ⏰";
+ [...$("answers").children].forEach(b=>{b.disabled=true;if(b.textContent===questions[index].answer)b.classList.add("selected")});
+ $("progress").style.width=`${(index+1)/questions.length*100}%`;
+ $("nextBtn").textContent=index===questions.length-1?"See my message 🌷":"Next question →";
+ $("nextBtn").classList.remove("hidden");
+}
+function next(){if(!locked)return;if(index<questions.length-1){index++;renderQuestion()}else finish()}
+function finish(){clearInterval(timer);show("result");$("score").textContent=`Your score: ${score} / ${questions.length} 🌸`;
+ $("message").textContent=score>=12?"Grabe, you really know me so well! I love youuu! 💗":score>=8?"Not bad, babyyy! There's still more to discover about me. I love you! 💞":"It's okay, babyyy. We still have so many memories to make together. I love you! 💗"}
+$("startBtn").addEventListener("click",start);$("nextBtn").addEventListener("click",next);$("againBtn").addEventListener("click",()=>{show("welcome");clearInterval(timer)});
+</script>
+</body>
+</html>
